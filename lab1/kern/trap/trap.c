@@ -155,7 +155,7 @@ void exception_handler(struct trapframe *tf) {
         case CAUSE_ILLEGAL_INSTRUCTION:
              cprintf("Exception type:Illegal instruction");
              cprintf("Illegal instruction caught at %d\n",tf->epc);
-             tf->epc=0;
+             tf->epc+=4;
              // 非法指令异常处理
              /* LAB1 CHALLENGE3   YOUR CODE :  */
             /*(1)输出指令异常类型（ Illegal instruction）
@@ -166,7 +166,7 @@ void exception_handler(struct trapframe *tf) {
         case CAUSE_BREAKPOINT:
             cprintf("Exception type: breakpoint");
             cprintf("ebreak caught at %d\n",tf->epc);
-            tf->epc=0;
+            tf->epc+=2;
             //断点异常处理
             /* LAB1 CHALLLENGE3   YOUR CODE :  */
             /*(1)输出指令异常类型（ breakpoint）
