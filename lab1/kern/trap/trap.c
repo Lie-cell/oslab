@@ -154,7 +154,7 @@ void exception_handler(struct trapframe *tf) {
             break;
         case CAUSE_ILLEGAL_INSTRUCTION:
              cprintf("Exception type:Illegal instruction");
-             cprintf("Illegal instruction caught at %d\n",tf->epc);
+             cprintf("Illegal instruction caught at %x\n",tf->epc);
              if ((tf->epc & 0x3)==0x3) {
                   tf->epc+=4;
     	     } else {
@@ -169,7 +169,7 @@ void exception_handler(struct trapframe *tf) {
             break;
         case CAUSE_BREAKPOINT:
             cprintf("Exception type: breakpoint");
-            cprintf("ebreak caught at %d\n",tf->epc);
+            cprintf("ebreak caught at %x\n",tf->epc);
             if ((tf->epc & 0x3)==0x3) {
                   tf->epc+=4;
     	     } else {
