@@ -60,7 +60,7 @@ static void buddy_init_memmap(struct Page *base, size_t n) {
     }
 }
 
-static struct Page* buddy_alloc_pages(size_t n) {
+struct Page* buddy_alloc_pages(size_t n) {
     assert(n > 0);
     if (n > buddy_free_tree[1]) {
         return NULL;
@@ -91,7 +91,7 @@ static struct Page* buddy_alloc_pages(size_t n) {
     return allocated_page; 
 }
 
-static void buddy_free_pages(struct Page *base, size_t n) {
+void buddy_free_pages(struct Page *base, size_t n) {
     assert(n > 0);
     unsigned int start_index = (unsigned int)(base - available_page_start);
     unsigned int index = available_page_count + start_index;
@@ -117,7 +117,7 @@ static void buddy_free_pages(struct Page *base, size_t n) {
     }
 }
 
-static size_t buddy_nr_free_pages(void) {
+size_t buddy_nr_free_pages(void) {
     return buddy_free_tree[1];
 }
 
