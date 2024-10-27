@@ -6,7 +6,7 @@
 #define SLAB_MIN_ORDER 3  
 #define SLAB_MAX_ORDER 6  
 #define PGSIZE 4096      
-#define MAX_PAGES 1024   
+#define MAX_PAGES 128   
 
 static struct slab_cache slab_caches[SLAB_MAX_ORDER - SLAB_MIN_ORDER + 1];
 static struct Page page_pool[MAX_PAGES]; 
@@ -34,6 +34,14 @@ void slub_init(void) {
 }
 
 void slub_init_memmap(struct Page *base, size_t n) {
+    assert(n > 0);
+    struct Page *p = base;
+    for (; p != base + n; p ++) {
+        assert(PageReserved(p));
+        p->flags =0;
+        p->property = 0;
+        set_page_ref(p, 0);
+    }
     for (size_t i = 0; i < n; i++) {
         struct Page *page = base + i;
 
