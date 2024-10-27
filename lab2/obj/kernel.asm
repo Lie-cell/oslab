@@ -1705,7 +1705,7 @@ ffffffffc0200b8a:	f114                	sd	a3,32(a0)
 ffffffffc0200b8c:	ed14                	sd	a3,24(a0)
                 cache->free_count++;
 ffffffffc0200b8e:	eb90                	sd	a2,16(a5)
-                return new_page;  // 返回新分配的页
+                return new_page;  
 ffffffffc0200b90:	8082                	ret
     return NULL;  // 如果找不到合适的 slab 或静态分配失败，返回 NULL
 ffffffffc0200b92:	4501                	li	a0,0
