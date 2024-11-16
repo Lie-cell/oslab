@@ -67,6 +67,7 @@ _fifo_swap_out_victim(struct mm_struct *mm, struct Page ** ptr_page, int in_tick
      /* Select the victim */
      //(1)  unlink the  earliest arrival page in front of pra_list_head qeueue
      //(2)  set the addr of addr of this page to ptr_page
+    cprintf("curr_ptr 0xffffffff%x\n",head->prev);
     list_entry_t* entry = list_prev(head);
     if (entry != head) {
         list_del(entry);
