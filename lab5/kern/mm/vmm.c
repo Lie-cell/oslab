@@ -200,8 +200,8 @@ dup_mmap(struct mm_struct *to, struct mm_struct *from) {
         }
 
         insert_vma_struct(to, nvma);
-
-        bool share = 0;
+        //cow
+        bool share = 1;
         if (copy_range(to->pgdir, from->pgdir, vma->vm_start, vma->vm_end, share) != 0) {
             return -E_NO_MEM;
         }
@@ -447,25 +447,37 @@ do_pgfault(struct mm_struct *mm, uint_t error_code, uintptr_t addr) {
         *    page_insert ： 建立一个Page的phy addr与线性addr la的映射
         *    swap_map_swappable ： 设置页面可交换
         */
-        if (swap_init_ok) {
-            struct Page *page = NULL;
-            swap_in(mm, addr, &page); 
-            page_insert(mm->pgdir, page, addr, perm); 
-            swap_map_swappable(mm, addr, page, 1);  
-            page->pra_vaddr = addr;
-            // 你要编写的内容在这里，请基于上文说明以及下文的英文注释完成代码编写
-            //(1）According to the mm AND addr, try
-            //to load the content of right disk page
-            //into the memory which page managed.
-            //(2) According to the mm,
-            //addr AND page, setup the
-            //map of phy addr <--->
-            //logical addr
-            //(3) make the page swappable.
-            page->pra_vaddr = addr;
-        } else {
-            cprintf("no swap_init_ok but ptep is %x, failed\n", *ptep);
-            goto failed;
+        struct Page *page =NULL;
+        if(*ptep & PTE_V)
+        { 
+            cprintf("\n\nCOW: ptep 0x%x, pte 0x%x\n",ptep, *ptep);
+            page = pte2page(*ptep);
+            if (page_ref(page) > 1)
+            {
+                struct Page *newPage = pgdir_alloc_page(mm->pgdir, addr, perm);
+                void *kva_src = page2kva(page);
+                void *kva_dst = page2kva(newPage);
+                memcpy(kva_dst, kva_src, PGSIZE);
+            }
+            else
+                page_insert(mm->pgdir, page, addr, perm);
+        }
+        else{
+            if (swap_init_ok) {
+                swap_in(mm, addr, &page); 
+                page_insert(mm->pgdir, page, addr, perm); 
+                swap_map_swappable(mm, addr, page, 1);  
+                page->pra_vaddr = addr;
+                // 你要编写的内容在这里，请基于上文说明以及下文的英文注释完成代码编写
+                //(1）According to the mm AND addr, try
+                //to load the content of right disk page
+                //into the memory which page managed.
+                //(2) According to the mm,
+                //addr AND page, setup the
+                //map of phy addr <--->
+                //logical addr
+                //(3) make the page swappable.
+            } 
         }
    }
    ret = 0;
