@@ -431,6 +431,7 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     if (proc == NULL) { 
         goto fork_out;
     }
+    assert(current->wait_state == 0);
     proc->parent = current;
     int a = setup_kstack(proc);
     if (a!= 0) {  
@@ -442,10 +443,12 @@ do_fork(uint32_t clone_flags, uintptr_t stack, struct trapframe *tf) {
     }
     copy_thread(proc, stack, tf);
     bool intr_flag;
-    local_intr_save(intr_flag); 
-    proc->pid = get_pid(); 
-    hash_proc(proc); 
-    set_links(proc);
+    local_intr_save(intr_flag);
+    {
+        proc->pid = get_pid();
+        hash_proc(proc);
+        set_links(proc);
+    }
     local_intr_restore(intr_flag);
     wakeup_proc(proc);
     ret = proc->pid;
